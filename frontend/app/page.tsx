@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
 import { api } from "../lib/api";
 
@@ -9,6 +10,7 @@ import RouteConfig from "../components/sidebar/RouteConfig";
 import AnalysisPanel from "../components/sidebar/AnalysisPanel";
 import CreatorFooter from "../components/sidebar/CreatorFooter";
 import MapLegend from "../components/MapLegend";
+import { Menu, X } from "lucide-react";
 
 const MapComponent = dynamic(() => import("../components/Map"), { ssr: false });
 
@@ -28,6 +30,7 @@ export default function Home() {
   const [useUserLocation, setUseUserLocation] = useState(false);
   const [isWatching, setIsWatching] = useState(false);
   const [watchId, setWatchId] = useState<number | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     api.getLocations()
@@ -161,25 +164,46 @@ export default function Home() {
     }
   };
 
-  const mapLocations = [...locations];
-  if (userLocation) {
-    mapLocations.push({
-      name: "Current Location",
-      type: "user",
-      lat: userLocation.lat,
-      lon: userLocation.lon,
-      category: "user"
-    });
-  }
+  const mapLocations = React.useMemo(() => {
+    const locs = [...locations];
+    if (userLocation) {
+      locs.push({
+        name: "Current Location",
+        type: "user",
+        lat: userLocation.lat,
+        lon: userLocation.lon,
+        category: "user"
+      });
+    }
+    return locs;
+  }, [locations, userLocation]);
 
   return (
     <main className="flex h-screen w-full bg-slate-100 relative overflow-hidden font-sans text-slate-900">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
-      <aside className="w-[400px] bg-white shadow-2xl z-30 flex flex-col border-r border-slate-200 h-full">
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="fixed top-4 left-4 z-30 p-3 bg-slate-900 text-white rounded-2xl shadow-2xl lg:hidden hover:bg-slate-800 active:scale-95 transition-all"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
 
-        <SidebarHeader />
+      <aside className={`
+        fixed inset-y-0 left-0 w-full max-w-[340px] lg:max-w-[400px] bg-white shadow-[30px_0_70px_rgba(0,0,0,0.08)] z-50 flex flex-col border-r border-slate-200 h-full transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:relative lg:translate-x-0
+      `}>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gradient-to-b from-white to-slate-50">
+        <SidebarHeader onClose={() => setIsSidebarOpen(false)} />
+
+        <div className="flex-1 overflow-y-auto p-5 space-y-8 bg-gradient-to-b from-white to-slate-50">
 
           <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-4">
             <span>System Status</span>
@@ -201,7 +225,10 @@ export default function Home() {
             setTrafficLevel={setTrafficLevel}
             loading={loading}
             locationsLoading={locationsLoading} // Pass the new loading state
-            handleRoute={handleRoute}
+            handleRoute={() => {
+              handleRoute();
+              if (window.innerWidth < 1024) setIsSidebarOpen(false);
+            }}
             getUserLocation={getUserLocation}
             isWatching={isWatching}
             useUserLocation={useUserLocation}
@@ -233,7 +260,9 @@ export default function Home() {
           transportMode={transportMode}
         />
 
-        <MapLegend />
+        <div className={isSidebarOpen ? "hidden lg:block" : "block"}>
+          <MapLegend />
+        </div>
       </div>
 
     </main>

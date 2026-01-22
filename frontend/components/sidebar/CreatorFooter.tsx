@@ -15,7 +15,7 @@ export default function CreatorFooter() {
                         </div>
                         <div>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider group-hover:text-blue-500 transition-colors">Meet the Developer</p>
-                            <p className="text-xs font-bold text-slate-800 leading-none mt-0.5">Obrempong Kwabena</p>
+                            <p className="text-xs font-bold text-slate-800 leading-none mt-0.5">Obrempong Kwabena Osei-Wusu</p>
                         </div>
                     </div>
                     <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all">

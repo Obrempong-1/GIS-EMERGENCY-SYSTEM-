@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, LayersControl, LayerGroup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap, LayersControl, LayerGroup, useMapEvents, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { api, RouteResponse } from '@/lib/api';
@@ -55,9 +55,10 @@ const fireIcon = new L.Icon({
 const userIcon = new L.DivIcon({
     className: 'pulsing-dot-marker',
     html: `
-        <div class="relative">
+        <div class="relative flex flex-col items-center">
             <div class="user-pulse"></div>
             <div class="user-dot"></div>
+            <span class="mt-5 px-2 py-0.5 bg-blue-600 text-white text-[10px] font-black rounded-full shadow-lg border border-white whitespace-nowrap">You</span>
         </div>
     `,
     iconSize: [20, 20],
@@ -179,19 +180,19 @@ export default function MapComponent({ locations, routePath, activeLocation, onU
                 maxBounds={knustBounds}
                 maxBoundsViscosity={1.0}
                 style={{ height: "100%", width: "100%", zIndex: 0 }}
+                zoomControl={false}
+                preferCanvas={true}
             >
                 <MapEvents setZoom={setZoomLevel} />
 
                 <LayersControl position="topright">
                     <LayersControl.BaseLayer checked name="Satellite (Hybrid)">
-                        <LayerGroup>
-                            <TileLayer
-                                attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                                maxNativeZoom={19}
-                                maxZoom={22}
-                            />
-                        </LayerGroup>
+                        <TileLayer
+                            attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                            maxNativeZoom={19}
+                            maxZoom={22}
+                        />
                     </LayersControl.BaseLayer>
 
                     <LayersControl.BaseLayer name="Street Map">
@@ -203,6 +204,7 @@ export default function MapComponent({ locations, routePath, activeLocation, onU
                         />
                     </LayersControl.BaseLayer>
                 </LayersControl>
+                <ZoomControl position="topright" />
 
                 {locations.map((loc: any, idx: number) => {
                     const isUser = loc.type === 'user';
@@ -235,9 +237,60 @@ export default function MapComponent({ locations, routePath, activeLocation, onU
                                     }
                                 } : undefined}
                             >
-                                <Popup>
-                                    <strong>{loc.name}</strong><br />
-                                    {isUser ? "Drag to correct location" : `Type: ${loc.type}`}
+                                <Popup className="custom-popup">
+                                    <div className="p-2 min-w-[240px]">
+                                        <div className="mb-3">
+                                            <h3 className="font-bold text-lg leading-tight">{loc.name}</h3>
+                                            <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mt-1">
+                                                {isUser ? "Your Location" : loc.type.replace('_', ' ')}
+                                            </p>
+                                        </div>
+
+                                        {!isUser && (loc.opening_hours || loc.phone || loc.description) && (
+                                            <div className="mb-3 space-y-2 text-sm">
+                                                {loc.description && (
+                                                    <p className="text-gray-700 italic border-l-2 border-blue-500 pl-2 text-xs">
+                                                        "{loc.description}"
+                                                    </p>
+                                                )}
+
+                                                {loc.opening_hours && (
+                                                    <div className="flex items-center gap-2 text-green-700 font-medium bg-green-50 px-2 py-1 rounded-md mb-1">
+                                                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                                        {loc.opening_hours}
+                                                    </div>
+                                                )}
+
+                                                {loc.phone && (
+                                                    <a href={`tel:${loc.phone}`} className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition font-semibold group bg-blue-50 px-2 py-1 rounded-md">
+                                                        <div className="p-1 bg-white rounded-full group-hover:scale-110 transition">📞</div>
+                                                        {loc.phone}
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="flex gap-2 text-xs text-gray-400 mb-3 border-t pt-2 border-gray-100">
+                                            <span>Lat: {loc.lat.toFixed(4)}</span>
+                                            <span>Lon: {loc.lon.toFixed(4)}</span>
+                                        </div>
+
+                                        {!isUser && (
+                                            <button
+                                                className="w-full bg-slate-900 text-white py-2 px-3 rounded-lg text-sm font-bold hover:bg-slate-700 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform active:scale-95"
+                                                onClick={() => handleNavigate(loc)}
+                                                disabled={loadingRoute}
+                                            >
+                                                {loadingRoute ? 'Calculating...' : (
+                                                    <>
+                                                        <Navigation size={16} />
+                                                        Directions Here
+                                                    </>
+                                                )}
+                                            </button>
+                                        )}
+                                        {isUser && <p className="text-xs text-center text-emerald-600 italic">Drag to adjust your position</p>}
+                                    </div>
                                 </Popup>
                             </Marker>
                         );
@@ -334,50 +387,52 @@ export default function MapComponent({ locations, routePath, activeLocation, onU
 
             </MapContainer>
 
-            {routeData && isNavigating && (
-                <div className="absolute top-4 left-4 z-[1000] w-80 bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
-                    <div className="bg-blue-600 p-4 text-white flex justify-between items-start">
-                        <div>
-                            <div className="flex items-center gap-2 text-2xl font-bold mb-1">
-                                <span className="text-3xl">{routeData.time_min}</span> <span className="text-sm font-normal opacity-90">min</span>
+            {
+                routeData && isNavigating && (
+                    <div className="absolute top-4 left-4 z-[1000] w-80 bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
+                        <div className="bg-blue-600 p-4 text-white flex justify-between items-start">
+                            <div>
+                                <div className="flex items-center gap-2 text-2xl font-bold mb-1">
+                                    <span className="text-3xl">{routeData.time_min}</span> <span className="text-sm font-normal opacity-90">min</span>
+                                </div>
+                                <div className="text-sm opacity-90">
+                                    {routeData.distance_km} km • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} arrival
+                                </div>
                             </div>
-                            <div className="text-sm opacity-90">
-                                {routeData.distance_km} km • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} arrival
-                            </div>
+                            <button
+                                onClick={() => {
+                                    setRouteData(null);
+                                    setIsNavigating(false);
+                                }}
+                                className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition"
+                            >
+                                <X size={20} />
+                            </button>
                         </div>
-                        <button
-                            onClick={() => {
-                                setRouteData(null);
-                                setIsNavigating(false);
-                            }}
-                            className="bg-white/20 p-1 rounded-full hover:bg-white/30 transition"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
 
-                    <div className="max-h-60 overflow-y-auto bg-gray-50">
-                        {routeData.instructions.length > 0 ? (
-                            <div className="divide-y divide-gray-200">
-                                {routeData.instructions.map((inst, i) => (
-                                    <div key={i} className="p-3 flex gap-3 hover:bg-white transition cursor-default">
-                                        <div className="mt-1 text-gray-400">
-                                            {i === routeData.instructions.length - 1 ? <MapPin size={18} /> : <Navigation size={18} />}
+                        <div className="max-h-60 overflow-y-auto bg-gray-50">
+                            {routeData.instructions.length > 0 ? (
+                                <div className="divide-y divide-gray-200">
+                                    {routeData.instructions.map((inst, i) => (
+                                        <div key={i} className="p-3 flex gap-3 hover:bg-white transition cursor-default">
+                                            <div className="mt-1 text-gray-400">
+                                                {i === routeData.instructions.length - 1 ? <MapPin size={18} /> : <Navigation size={18} />}
+                                            </div>
+                                            <div className="text-sm text-gray-700 leading-snug">
+                                                {inst}
+                                            </div>
                                         </div>
-                                        <div className="text-sm text-gray-700 leading-snug">
-                                            {inst}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="p-4 text-center text-gray-500 text-sm">
-                                Direct route (no turns)
-                            </div>
-                        )}
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-4 text-center text-gray-500 text-sm">
+                                    Direct route (no turns)
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
