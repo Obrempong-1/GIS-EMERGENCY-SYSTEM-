@@ -18,6 +18,7 @@ export default function Home() {
   const [destination, setDestination] = useState<string>("");
   const [routeData, setRouteData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [locationsLoading, setLocationsLoading] = useState(true); // New state for initial data fetch
   const [error, setError] = useState("");
 
   const [transportMode, setTransportMode] = useState<string>("drive");
@@ -30,8 +31,14 @@ export default function Home() {
 
   useEffect(() => {
     api.getLocations()
-      .then(data => setLocations(data))
-      .catch(err => console.error("API Error:", err));
+      .then(data => {
+        setLocations(data);
+        setLocationsLoading(false);
+      })
+      .catch(err => {
+        console.error("API Error:", err);
+        setLocationsLoading(false);
+      });
 
     return () => {
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
@@ -193,6 +200,7 @@ export default function Home() {
             trafficLevel={trafficLevel}
             setTrafficLevel={setTrafficLevel}
             loading={loading}
+            locationsLoading={locationsLoading} // Pass the new loading state
             handleRoute={handleRoute}
             getUserLocation={getUserLocation}
             isWatching={isWatching}
