@@ -434,6 +434,9 @@ export default function MapComponent({ locations, routePath, activeLocation, onU
                 style={{ height: "100%", width: "100%", zIndex: 0 }}
                 zoomControl={false}
                 preferCanvas={true}
+                zoomSnap={0}
+                zoomDelta={0.25}
+                wheelPxPerZoomLevel={60}
             >
                 <MapContent
                     locations={locations}
