@@ -11,11 +11,15 @@ export default function MapLegend() {
                 <span className="text-[10px] md:text-xs font-semibold text-slate-600">Medical Center</span>
             </div>
             <div className="flex items-center gap-2 md:gap-3">
-                <span className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm bg-yellow-400 shadow-sm ring-2 ring-yellow-100"></span>
+                <span className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm bg-orange-500 shadow-sm ring-2 ring-orange-100"></span>
+                <span className="text-[10px] md:text-xs font-semibold text-slate-600">Fire Station</span>
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
+                <span className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm bg-amber-400 shadow-sm ring-2 ring-amber-100"></span>
                 <span className="text-[10px] md:text-xs font-semibold text-slate-600">Incident Zone</span>
             </div>
             <div className="flex items-center gap-2 md:gap-3">
-                <span className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm bg-emerald-500 shadow-sm ring-2 ring-emerald-100"></span>
+                <span className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-sm bg-blue-500 shadow-sm ring-2 ring-blue-100 uppercase animate-pulse"></span>
                 <span className="text-[10px] md:text-xs font-semibold text-slate-600">Your Location</span>
             </div>
         </div>
