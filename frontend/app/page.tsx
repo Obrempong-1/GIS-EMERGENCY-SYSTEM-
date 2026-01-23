@@ -231,7 +231,7 @@ export default function Home() {
             trafficLevel={trafficLevel}
             setTrafficLevel={setTrafficLevel}
             loading={loading}
-            locationsLoading={locationsLoading} // Pass the new loading state
+            locationsLoading={locationsLoading} 
             handleRoute={() => {
               handleRoute();
               if (window.innerWidth < 1024) setIsSidebarOpen(false);
