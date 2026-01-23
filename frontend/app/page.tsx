@@ -201,7 +201,14 @@ export default function Home() {
         lg:relative lg:translate-x-0
       `}>
 
-        <SidebarHeader onClose={() => setIsSidebarOpen(false)} />
+        <SidebarHeader
+          locations={locations}
+          onLocationSelect={(loc) => {
+            setDestination(loc.name);
+            if (window.innerWidth < 1024) setIsSidebarOpen(false);
+          }}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
         <div className="flex-1 overflow-y-auto p-5 space-y-8 bg-gradient-to-b from-white to-slate-50">
 

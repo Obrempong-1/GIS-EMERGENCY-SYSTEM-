@@ -1,4 +1,4 @@
-import { ShieldAlert, MapPin, LocateFixed, ChevronRight, Stethoscope, Navigation, AlertTriangle, ChevronDown, Check, Siren, Target, Car, Zap, Bike } from "lucide-react";
+import { ShieldAlert, MapPin, LocateFixed, ChevronRight, Stethoscope, Navigation, AlertTriangle, ChevronDown, Check, Siren, Target, Car, Zap, Bike, Search } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 
 interface RouteConfigProps {
@@ -32,17 +32,23 @@ const LocationDropdown = ({
     useUserLocationActive = false
 }: any) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
+                setSearchTerm("");
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const filteredOptions = options.filter((opt: any) =>
+        opt.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="space-y-2 relative" ref={dropdownRef}>
@@ -71,11 +77,25 @@ const LocationDropdown = ({
                 </div>
 
                 <div className={`
-                    absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] max-h-60 overflow-hidden transition-all duration-300 origin-top
+                    absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] max-h-80 overflow-hidden transition-all duration-300 origin-top
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'}
                 `}>
-                    <div className="overflow-y-auto max-h-60 custom-scrollbar p-1.5">
-                        {options.map((opt: any, i: number) => (
+                    <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 p-2 z-10">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Filter locations..."
+                                className="w-full pl-9 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-semibold focus:ring-2 focus:ring-blue-500/20 text-slate-700 placeholder:text-slate-400"
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="overflow-y-auto max-h-60 custom-scrollbar p-1.5 pt-0">
+                        {filteredOptions.map((opt: any, i: number) => (
                             <div
                                 key={i}
                                 className={`
@@ -85,6 +105,7 @@ const LocationDropdown = ({
                                 onClick={() => {
                                     onChange(opt.name);
                                     setIsOpen(false);
+                                    setSearchTerm("");
                                 }}
                             >
                                 <div className="flex items-center">
@@ -94,7 +115,7 @@ const LocationDropdown = ({
                                 <span className="text-[9px] text-slate-300 uppercase font-black opacity-0 group-hover/opt:opacity-100 transition-opacity">{opt.type}</span>
                             </div>
                         ))}
-                        {options.length === 0 && <div className="p-8 text-center text-slate-400 italic text-xs">Loading data...</div>}
+                        {filteredOptions.length === 0 && <div className="p-8 text-center text-slate-400 italic text-xs">No locations found matching "{searchTerm}"</div>}
                     </div>
                 </div>
             </div>

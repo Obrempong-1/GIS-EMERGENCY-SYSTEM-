@@ -55,13 +55,29 @@ export default function CreatorContent() {
                                 Obrempong Kwabena Osei-Wusu
                             </h1>
                             <p className="text-lg font-medium text-slate-500 mb-8">
-                                Geomatic Engineer & Full-Stack Developer
+                                Geomatic Engineering Student & Full-Stack Developer
                             </p>
 
                             <div className="space-y-6 text-slate-600 leading-relaxed">
                                 <p>
                                     I describe myself as a hungry young man, totally out of his comfort zone, living his epic vision for Ghana, Africa, and the world at large.
                                 </p>
+
+                                <div className="relative p-6 my-8 rounded-2xl bg-slate-900 text-white shadow-2xl overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-blue-500/30 transition-all duration-700"></div>
+                                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-red-500/10 rounded-full -ml-10 -mb-10 blur-2xl group-hover:bg-red-500/20 transition-all duration-700"></div>
+
+                                    <div className="relative z-10">
+                                        <div className="text-4xl font-serif text-blue-500 leading-none h-4 mb-2 opacity-50">"</div>
+                                        <p className="text-xl md:text-2xl font-black tracking-tight italic leading-relaxed pr-4">
+                                            Outside death every defeat is psychological
+                                        </p>
+                                        <div className="mt-4 flex items-center gap-3">
+                                            <div className="h-[2px] w-10 bg-blue-500 rounded-full"></div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Personal Philosophy</span>
+                                        </div>
+                                    </div>
+                                </div>
                                 <p>
                                     My sister, <a href="https://www.linkedin.com/in/abigail-n-akua-osei-wusu-68862bb9/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 font-bold text-slate-800 border-b-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 transition-all group">Abigail Nana Akua Osei-Wusu <ArrowUpRight size={14} className="text-slate-400 group-hover:text-blue-500 transition-colors" /></a> (Architect), who has been a pillar of inspiration and one of my models in the construction industry.
                                 </p>
@@ -72,7 +88,7 @@ export default function CreatorContent() {
                                     To <span className="font-bold text-slate-800">Dr. Kwame Obeng</span> your impact on my life serves as a constant reminder of the power of mentorship. Your profound wisdom, fatherly guidance, and unwavering belief in my potential have shaped not just my career, but the very content of my character. I am forever grateful for your presence in my life.
                                 </p>
                                 <p>
-                                    Most importantly, this journey is a testament to the grace of God and the unwavering support of my family, especially my mum.
+                                    Most importantly, this journey is a testament to the grace of God and the unwavering support of my father, my sisters, and especially my mum.
                                 </p>
                             </div>
 
@@ -93,7 +109,7 @@ export default function CreatorContent() {
 
                         </div>
 
-                        {/* Floating Programmer Animation (Mobile & Desktop) */}
+                        {/* Floating Programmer Animation (Mobile and Desktop) */}
                         <div className="absolute top-4 right-4 w-24 h-24 md:top-6 md:right-6 md:w-32 md:h-32 opacity-90 pointer-events-none z-50">
                             <Lottie animationData={programmerData} loop={true} className="w-full h-full" />
                         </div>
