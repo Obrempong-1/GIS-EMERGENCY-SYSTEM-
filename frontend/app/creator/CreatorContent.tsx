@@ -60,7 +60,7 @@ export default function CreatorContent() {
 
                             <div className="space-y-6 text-slate-600 leading-relaxed">
                                 <p>
-                                    I describe myself as a hungry young man, totally out of his comfort zone, living his epic vision for Ghana, Africa, and the world at large.
+                                    I describe myself as a hungry young man, totally out of his comfort zone, living his epic vision for the church, Ghana, Africa, and the world at large.
                                 </p>
 
                                 <div className="relative p-6 my-8 rounded-2xl bg-slate-900 text-white shadow-2xl overflow-hidden group">
